@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-inventory-worker
+  labels:
+    name: locust-inventory-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locust-inventory-worker
+  template:
+    metadata:
+      labels:
+        app: locust-inventory-worker
+        name: locust-inventory-worker
+        role: worker
+    spec:
+      containers:
+        - name: locust-inventory-worker
+          image: locust/custom-locust:latest # Custom Locust version
+          resources:
+            limits:
+              cpu: 200m
+            requests:
+              cpu: 100m
+          env:
+            - name: LOCUST_MODE_WORKER
+              value: "true"
+            - name: LOCUST_MASTER_NODE_HOST
+              value: locust-inventory-master # Master Deployment Name
+            - name: LOCUST_LOCUSTFILE
+              value: load_tests/inventory/locustfile.py
+            - name: LOCUST_HOST
+              value: "http://0.0.0.0:8009"

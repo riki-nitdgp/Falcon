@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-inventory-master
+  labels:
+    name: locust-inventory-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locust-inventory-master
+  template:
+    metadata:
+      labels:
+        app: locust-inventory-master
+        name: locust-inventory-master
+        role: master
+    spec:
+      containers:
+        - name: locust-inventory-master
+          image: locust/custom-locust:latest
+          resources:
+            limits:
+              cpu: 1900
+            requests:
+              cpu: 900
+          env:
+            - name: LOCUST_MODE_MASTER
+              value: "true"
+            - name: LOCUST_EXPECT_WORKERS
+              value: "1"
+            - name: LOCUST_LOCUSTFILE
+              value: load_tests/inventory/locustfile.py
+            - name: LOCUST_HOST
+              value: "http://0.0.0.0:8009"
+          ports:
+            - name: loc-master-web
+              containerPort: 8089
+              protocol: TCP
+            - name: loc-master-p1
+              containerPort: 5557
+              protocol: TCP
+            - name: loc-master-p2
+              containerPort: 5558
+              protocol: TCP
